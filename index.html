@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Кольца Ньютона</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="panel">
+      <h1>Моделирование колец Ньютона</h1>
+      <p>Интерференционная картина для линзы заданного радиуса кривизны. Поддерживается монохроматический и квазимонохроматический свет.</p>
+
+      <div class="grid">
+        <label>Радиус линзы R, м
+          <input id="R" type="number" value="1" min="0.05" step="0.05">
+        </label>
+        <label>Центральная длина волны λ₀, нм
+          <input id="lambda0" type="number" value="550" min="380" max="780" step="1">
+        </label>
+        <label>Ширина спектра Δλ, нм
+          <input id="width" type="number" value="0" min="0" max="150" step="1">
+        </label>
+        <label>Размер области, мм
+          <input id="viewSize" type="number" value="6" min="1" max="20" step="0.5">
+        </label>
+        <label>Число спектральных компонент
+          <input id="components" type="number" value="15" min="1" max="61" step="2">
+        </label>
+        <label>Режим
+          <select id="mode">
+            <option value="reflected" selected>Отражённый свет</option>
+            <option value="transmitted">Прошедший свет</option>
+          </select>
+        </label>
+      </div>
+
+      <button id="redraw">Пересчитать</button>
+
+      <div class="formula">
+        <b>Модель:</b> толщина воздушного зазора t(r)=r²/(2R), интенсивность в отражённом свете
+        I(r,λ)=I₀·(1-cos(4πt/λ))/2.
+      </div>
+    </section>
+
+    <section class="canvasWrap">
+      <canvas id="rings" width="700" height="700"></canvas>
+    </section>
+
+    <section class="chartWrap">
+      <h2>Интенсивность от радиальной координаты</h2>
+      <canvas id="chart" width="900" height="320"></canvas>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
