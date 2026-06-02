@@ -88,26 +88,104 @@ function drawRings(){
 
 function drawChart(p,spec,maxR){
   const w=chart.width,h=chart.height;
+
   cctx.clearRect(0,0,w,h);
-  cctx.fillStyle='#05070d'; cctx.fillRect(0,0,w,h);
+
+  cctx.fillStyle='#05070d';
+  cctx.fillRect(0,0,w,h);
+
   const pad=45;
-  cctx.strokeStyle='#64748b'; cctx.lineWidth=1;
-  cctx.beginPath(); cctx.moveTo(pad,pad); cctx.lineTo(pad,h-pad); cctx.lineTo(w-pad,h-pad); cctx.stroke();
-  cctx.fillStyle='#cbd5e1'; cctx.font='14px Arial';
-  cctx.fillText('I/I0',10,pad+5); cctx.fillText('r, мм',w-pad-35,h-12);
-  cctx.strokeStyle='#e2e8f0'; cctx.lineWidth=2; cctx.beginPath();
-  const points=500;
+
+  cctx.strokeStyle='#64748b';
+  cctx.lineWidth=1;
+
+  cctx.beginPath();
+  cctx.moveTo(pad,pad);
+  cctx.lineTo(pad,h-pad);
+  cctx.lineTo(w-pad,h-pad);
+  cctx.stroke();
+
+  cctx.fillStyle='#cbd5e1';
+  cctx.font='14px Arial';
+
+  cctx.fillText('I/I0',10,pad+5);
+  cctx.fillText('r, мм',w-pad-35,h-12);
+
+  const points=2000;
+
+  const data=[];
+
   for(let i=0;i<points;i++){
     const r=maxR*i/(points-1);
     const I=intensityFor(r,p,spec).scalar;
-    const x=pad+(w-2*pad)*i/(points-1);
-    const y=h-pad-(h-2*pad)*I;
-    if(i===0)cctx.moveTo(x,y); else cctx.lineTo(x,y);
+    data.push({r,I});
   }
+
+  cctx.strokeStyle='#e2e8f0';
+  cctx.lineWidth=2;
+  cctx.beginPath();
+
+  data.forEach((pnt,i)=>{
+    const x=pad+(w-2*pad)*i/(points-1);
+    const y=h-pad-(h-2*pad)*pnt.I;
+
+    if(i===0) cctx.moveTo(x,y);
+    else cctx.lineTo(x,y);
+  });
+
   cctx.stroke();
+
+  // поиск максимумов
+  const maxima=[];
+
+  for(let i=1;i<data.length-1;i++){
+
+    if(
+      data[i].I > data[i-1].I &&
+      data[i].I > data[i+1].I
+    ){
+      maxima.push({
+        index:i,
+        r:data[i].r,
+        I:data[i].I
+      });
+
+      if(maxima.length===5) break;
+    }
+  }
+
+  cctx.fillStyle='#ff5555';
+
+  maxima.forEach((m,n)=>{
+
+    const x=pad+(w-2*pad)*m.index/(points-1);
+
+    const y=h-pad-(h-2*pad)*m.I;
+
+    cctx.beginPath();
+    cctx.arc(x,y,4,0,2*Math.PI);
+    cctx.fill();
+
+    cctx.fillText(
+      `${(m.r*1000).toFixed(3)} мм`,
+      x+6,
+      y-6
+    );
+  });
+
   cctx.fillStyle='#94a3b8';
-  cctx.fillText((maxR*1000).toFixed(2),w-pad-20,h-pad+20);
-  cctx.fillText('0',pad-5,h-pad+20);
+
+  cctx.fillText(
+    (maxR*1000).toFixed(2),
+    w-pad-20,
+    h-pad+20
+  );
+
+  cctx.fillText(
+    '0',
+    pad-5,
+    h-pad+20
+  );
 }
 
 document.getElementById('redraw').addEventListener('click',drawRings);
